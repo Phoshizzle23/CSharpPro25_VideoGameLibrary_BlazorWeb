@@ -1,0 +1,46 @@
+﻿@page "/videogames"
+@inject HttpClient http
+@inject NavigationManager NavigationManager
+<h3>Video Games</h3>
+
+<button @onclick="AddVideoGame" class="btn btn-primary">Add Video Game</button>
+<br/>
+
+@if(games is null)
+{
+    <span>Loading Video Games...</span>
+}
+else
+{
+    <QuickGrid Items="games.AsQueryable()">
+        <PropertyColumn Property="g => g.Title" />
+        <PropertyColumn Property="g => g.Publisher" />
+        <PropertyColumn Property="g => g.ReleaseYear" />
+        <TemplateColumn>
+            <button @onclick="(() => EditVideoGame(context.Id))" class="btn btn-primary">Edit</button>
+        </TemplateColumn>
+    </QuickGrid>    
+    
+}
+
+@code {
+    List<VideoGame>? games;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await http.GetFromJsonAsync<List<VideoGame>>("api/videogame");
+        if (result != null)
+            games = result;
+    }
+
+    void AddVideoGame()
+    {
+        NavigationManager.NavigateTo("/videogame");
+    }
+
+    void EditVideoGame(int id)
+    {
+        NavigationManager.NavigateTo($"/videogame/{id}");
+    }
+
+}
